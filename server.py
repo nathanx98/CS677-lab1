@@ -1,13 +1,9 @@
-from rpyc import Service
-from rpyc.utils.server import ThreadedServer
+from doctest import testfile
+from xmlrpc.server import SimpleXMLRPCServer
 
-import time
+def testFunc(num1, num2):
+	return num1 + num2
 
-class TimeService(Service):
-	def exposed_get_time(self):
-		return time.ctime()
-
-
-if __name__ == '__main__':
-    s = ThreadedServer(TimeService, port=18871)
-    s.start()
+server = SimpleXMLRPCServer(("localhost", 6789))
+server.register_function(testFunc, "testFunc")
+server.serve_forever()

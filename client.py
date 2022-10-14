@@ -1,4 +1,8 @@
-import rpyc
+import xmlrpc.client
 
-conn = rpyc.connect('localhost', 18871)
-print('Time is {}'.format(conn.root.get_time()))
+proxy = xmlrpc.client.ServerProxy("http://localhost:6789")
+num1 = 12
+num2 = 31
+
+result = proxy.testFunc(num1, num2)
+print("Result is:", result)
