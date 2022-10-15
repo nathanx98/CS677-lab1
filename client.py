@@ -1,12 +1,19 @@
 import xmlrpc.client
-import sys
 
-proxy = xmlrpc.client.ServerProxy("http://localhost:6789")
-num1 = 12
-num2 = 31
+class client:
+    
+    def __init__(self, proxyaddr):
+        self.proxyaddr = proxyaddr
+    
+    def startProxy(self):
+        proxy = xmlrpc.client.ServerProxy(self.proxyaddr)
+        self.proxy = proxy
 
-result = proxy.testFunc(num1, num2)
-print("Result is:", result)
+    def run(self, num1, num2):
+        return self.proxy.testFunc(num1, num2)
 
-print(sys.argv)
-proxy.updateCache(f'message is: {sys.argv[1]}')
+if __name__ == '__main__':
+    myclient = client("http://localhost:6799")
+    myclient.startProxy()
+    res = myclient.run(12, 31)
+    print("Result is:", res)
