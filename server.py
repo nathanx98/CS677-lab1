@@ -1,17 +1,17 @@
 from doctest import testfile
 from xmlrpc.server import SimpleXMLRPCServer
+import xmlrpc.client
 
-def testFunc(num1, num2):
-	return num1 + num2
 
 
 cache = []
+
 def updateCache(elem):
 	cache.append(elem)
-	print(cache)
+	print("cache is: ", cache)
 	return "message updated"
 
+
 server = SimpleXMLRPCServer(("localhost", 6789))
-server.register_function(testFunc, "testFunc")
 server.register_function(updateCache, "updateCache")
 server.serve_forever()
