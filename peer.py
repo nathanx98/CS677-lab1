@@ -5,8 +5,8 @@ import threading
 class Peer:
     def __init__(self, name, addr, port) -> None:
         self.msg = []
-        self.name = name
-        # use this to connect to user server
+        self.name = name #(this could be role?)
+        # update proxy when connected to other server (neighbor)
         self.proxy = None
         self.server = SimpleXMLRPCServer((addr, port), allow_none=True)
         self.server.register_function(self.send, "send")
@@ -20,5 +20,18 @@ class Peer:
     def send(self, message):
         self.msg.append(message)
         print(f"messgge from {message}")
+
+    # lookup by the buyer, terminate when hopCount = 0
+    def lookup(buyerId, product_name:str, hopCount:int, path: list):
+        pass
+
+    # reply message by the seller
+    def reply(sellerId, path:list):
+        pass
+
+    # buyer picks one seller with {peerId} if multiple sellers respond
+    def buy(peerId, path:list):
+        pass
+
 
 
