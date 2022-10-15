@@ -22,16 +22,14 @@ class Peer:
         print(f"messgge from {message}")
 
     # lookup by the buyer, terminate when hopCount = 0
-    def lookup(buyerId, product_name:str, hopCount:int, path: list):
+    def lookup(self, buyerId, product_name:str, hopCount:int, path: list):
         pass
 
     # reply message by the seller
-    def reply(sellerId, path:list):
+    def reply(self, sellerId, path:list):
         pass
 
     # buyer picks one seller with {peerId} if multiple sellers respond
-    def buy(peerId, path:list):
+    def buy(self, peerId, path:list):
         pass
-
-
 
