@@ -11,6 +11,9 @@ class Peer:
         self.server = SimpleXMLRPCServer((addr, port), allow_none=True)
         self.server.register_function(self.send, "send")
     
+    def startServer(self):
+        threading.Thread(target=self.server.serve_forever).start()
+    
     # connect to another rpc server
     def connect(self, port):
         print(f"http://localhost:{port}")

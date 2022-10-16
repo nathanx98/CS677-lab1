@@ -3,13 +3,15 @@ import threading
 
 # start server 
 p1 = peer.Peer('p1', "localhost", 8888)
-t = threading.Thread(target=p1.server.serve_forever)
-t.start()
+# t = threading.Thread(target=p1.server.serve_forever)
+# t.start()
+p1.startServer()
 
 
 p2 = peer.Peer('p2', "localhost", 4444)
-t = threading.Thread(target=p2.server.serve_forever)
-t.start()
+# t = threading.Thread(target=p2.server.serve_forever)
+# t.start()
+p2.startServer()
 
 # connect to port to send messages
 p1.connect(4444)
