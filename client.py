@@ -1,7 +1,5 @@
 import xmlrpc.client
-from xmlrpc.server import SimpleXMLRPCServer
 import sys
-import threading
 
 proxy = xmlrpc.client.ServerProxy("http://localhost:6789")
 
@@ -13,11 +11,11 @@ def func():
 def send():
     proxy.updateCache('hello')
 
+result = proxy.testFunc(num1, num2)
+print("Result is:", result)
 
-server = SimpleXMLRPCServer(("localhost", 6790), allow_none=True)
-server.register_function(func, "func")
-t1 = threading.Thread(target=server.serve_forever)
-t2 = threading.Thread(target=send)
+print(sys.argv)
+proxy.updateCache(f'message is: {sys.argv[1]}')
 
 t1.start()
 t2.start()
