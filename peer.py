@@ -1,4 +1,3 @@
-from cgitb import lookup
 from xmlrpc.server import SimpleXMLRPCServer
 import xmlrpc.client
 import threading
