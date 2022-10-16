@@ -3,20 +3,21 @@ import xmlrpc.client
 import threading
 import random
 import time
+import sys
 
 class Peer(): #Peer(SimpleXMLRPCServer):
     #Peer class extends the capabilities of the simpleXMLRPCServer
 
-    def __init__(self, name, addr, serverport) -> None:
+    def __init__(self, name, serverport, peerlist=None,) -> None:
         #super().__init__((addr, serverport), allow_none=True)
         self.msg = []
         self.name = name #pid or tuple(host,port)?
-        self.locate = [addr,serverport]
+        self.locate = serverport #[addr,serverport]
         self.myrole = None
-        
+        self.peerlist = peerlist
         # update proxy when connected to other server (neighbor)
         self.proxy = None
-        self.server = SimpleXMLRPCServer((addr, serverport), allow_none=True)
+        self.server = SimpleXMLRPCServer(('localhost', serverport), allow_none=True)
         self.server.register_function(self.send, "send")
         self.server.register_function(self.lookup, 'lookup')
         self.server.register_function(self.buy, 'buy')
@@ -34,7 +35,7 @@ class Peer(): #Peer(SimpleXMLRPCServer):
     # send a message to proxy
     def send(self, message):
         self.msg.append(message)
-        print(f"messgge from {message}")
+        print(f"message from {message}")
 
     def passMSG(self, destPort, message):
         self.connect(destPort)
@@ -59,12 +60,12 @@ class Peer(): #Peer(SimpleXMLRPCServer):
             self.setmyrole('seller')
 
     # lookup by the buyer, terminate when hopCount = 0
-    def lookup(self, product_name, hopCount, peerlist, searchpath):
+    def lookup(self, product_name, hopCount, searchpath):
         
         if hopCount == 0: #once hopcount reaches zero we stop the message
             pass
 
-        myneighbors = peerlist[self.name]
+        myneighbors = self.peerlist[self.name]
         hopCount = hopCount -1 #decrement hopcount now that we made a hop
 
         if self.myrole == 'buyer': #if I'm a buyer just pass the message along
@@ -72,16 +73,16 @@ class Peer(): #Peer(SimpleXMLRPCServer):
 
             for n in range(len(myneighbors)):
                 neighbor = myneighbors[n]
-                self.connect(neighbor[1]) #establish connection to my neighbor
-                self.proxy.lookup(product_name, hopCount, peerlist, searchpath) #invoke the lookup function on my neighbor with the new path
+                self.connect(neighbor) #establish connection to my neighbor
+                self.proxy.lookup(product_name, hopCount, searchpath) #invoke the lookup function on my neighbor with the new path
         
         elif self.product_name != product_name: #I'm a seller but not for that item
             searchpath = searchpath.append(self.locate) #add my location to the path
 
             for n in range(len(myneighbors)):
                 neighbor = myneighbors[n]
-                self.connect(neighbor[1]) #establish connection to my neighbor
-                self.proxy.lookup(product_name, hopCount, peerlist, searchpath) #invoke the lookup function on my neighbor with the new path
+                self.connect(neighbor) #establish connection to my neighbor
+                self.proxy.lookup(product_name, hopCount, searchpath) #invoke the lookup function on my neighbor with the new path
         
         else: #I'm a seller for that item
             self.reply(self.name, searchpath)
@@ -115,11 +116,9 @@ class Peer(): #Peer(SimpleXMLRPCServer):
         self.proxy.buy(buyerId, peerId, path)
 
 #-----------------------------------------------------------------
-    def mainloop(self, peerlist):
-        self.startServer() #start server to listen for requests
-
-        self.peerlist = peerlist
-        myneighbors = peerlist[self.name]
+    def mainloop(self):
+        self.peerlist = self.peerlist
+        myneighbors = self.peerlist[self.name]
 
         if self.myrole == None:
             self.setmyrole() #peer decides which role it will be in the bazaar
@@ -134,7 +133,7 @@ class Peer(): #Peer(SimpleXMLRPCServer):
             #send on to my neighbors by calling the lookup function
             for n in range(len(myneighbors)):
                 searchpath = list()
-                self.lookup(product_id, 3, peerlist, searchpath)
+                self.lookup(product_id, 3, searchpath)
             
             print(self.name, "is a buyer, waiting...")
             time.sleep(5)
@@ -144,7 +143,18 @@ class Peer(): #Peer(SimpleXMLRPCServer):
             sellerId, path = random.choice(list(self.replyqueue.items())) #randomly choice a seller
             self.buy(self.name, sellerId, path)
 
-        else: #start server and wait for requests
-            self.startServer()
+if __name__ == "__main__":
+    peerlist = {'all':[9001,9002,9003,9004,9005,9006], 
+            'p1':[9002,9003], 'p2':[9004,9005], 
+            'p3':[9005,9006], 'p4':[9002,9005], 
+            'p5':[9002,9003,9004], 'p6':[9001,9003]}
+
+    p = Peer(sys.argv[1], int(sys.argv[2]), peerlist)
+    
+    time.sleep(5) #allow time for other peers to start
+    
+    p.mainloop()
+    print("i finished my loop")
+
 
 
