@@ -18,7 +18,6 @@ class Peer(): #Peer(SimpleXMLRPCServer):
         self.proxy = None
         self.server = SimpleXMLRPCServer((addr, serverport), allow_none=True)
         self.server.register_function(self.send, "send")
-        self.server.register_function(self.myrole, 'myrole')
         self.server.register_function(self.lookup, 'lookup')
         self.server.register_function(self.buy, 'buy')
         self.server.register_function(self.reply, 'reply')
@@ -60,7 +59,7 @@ class Peer(): #Peer(SimpleXMLRPCServer):
             self.setmyrole('seller')
 
     # lookup by the buyer, terminate when hopCount = 0
-    def lookup(self, product_name:str, hopCount:int, peerlist, searchpath):
+    def lookup(self, product_name, hopCount, peerlist, searchpath):
         
         if hopCount == 0: #once hopcount reaches zero we stop the message
             pass
