@@ -2,11 +2,6 @@ import peer
 import os
 import threading
 
-#Simple function to kill a server    
-def kill(server):
-    server.quit = 1
-    return 1
-
 # start server 
 p1 = peer.Peer('p1', "localhost", 8890)
 # t = threading.Thread(target=p1.server.serve_forever)
@@ -34,10 +29,6 @@ p3.connect(4446)
 p3.proxy.send("hi from peer 3")
 print(p2.msg)
 
-kill(p1)
-kill(p2)
-kill(p3)
-
 #-----------------------------------------------------------------
 # adding bazaar functionality to peer class
 # start server 
@@ -53,10 +44,6 @@ seller1 = peer.Peer('seller', "localhost", 8003)
 # t.start()
 seller1.setmyrole('salt_seller')
 #seller1.startServer()
-
-kill(buyer)
-kill(seller1)
-
 
 p1 = peer.Peer('p1', "localhost", 8006)
 p2 = peer.Peer('p2', "localhost", 8007)

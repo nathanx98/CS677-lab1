@@ -4,11 +4,11 @@ import threading
 import random
 import time
 
-class Peer(SimpleXMLRPCServer):
+class Peer(): #Peer(SimpleXMLRPCServer):
     #Peer class extends the capabilities of the simpleXMLRPCServer
 
     def __init__(self, name, addr, serverport) -> None:
-        super().__init__((addr, serverport), allow_none=True)
+        #super().__init__((addr, serverport), allow_none=True)
         self.msg = []
         self.name = name #pid or tuple(host,port)?
         self.locate = [addr,serverport]
@@ -16,22 +16,16 @@ class Peer(SimpleXMLRPCServer):
         
         # update proxy when connected to other server (neighbor)
         self.proxy = None
-        #self.server = SimpleXMLRPCServer((addr, port), allow_none=True)
-        self.register_function(self.send, "send")
+        self.server = SimpleXMLRPCServer((addr, serverport), allow_none=True)
+        self.server.register_function(self.send, "send")
+        self.server.register_function(self.myrole, 'myrole')
+        self.server.register_function(self.lookup, 'lookup')
+        self.server.register_function(self.buy, 'buy')
+        self.server.register_function(self.reply, 'reply')
     
-    def serve_forever(self):
-    #modifies the server forever function in simplXMLRPCServer to handle requests forever
-    #until told to quit
-        self.quit = 0
-        self.register_function(self.lookup, 'lookup')
-        self.register_function(self.buy, 'buy')
-        self.register_function(self.reply, 'reply')
-        while not self.quit:
-            self.handle_request()
-
     def startServer(self):
         #starts server runinng on a seperate thread to listen for messages
-        threading.Thread(target=self.serve_forever).start()
+        threading.Thread(target=self.server.serve_forever).start()
     
     # connect to another rpc server
     def connect(self, port):
